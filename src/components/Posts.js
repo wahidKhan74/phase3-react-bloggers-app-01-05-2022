@@ -1,4 +1,7 @@
 import React from "react";
+import PostDetails from "./PostDetails";
+import PostFilter from "./PostFilter";
+import PostForm from "./PostForm";
 
 class Posts extends React.Component {
   // data
@@ -89,24 +92,18 @@ class Posts extends React.Component {
     });
   };
 
-
   // Event Handler
   handleFormSubmit(event) {
     // prevent default event submit
     event.preventDefault();
     // console.log("post", this.state.post);
     this.setState((prevState)=>{
-        const id = prevState.posts.length ===0 ? 1 : prevState.posts[prevState.posts.length-1].id+1;
+        const id = (prevState.posts.length ===0) ? 1 : prevState.posts[prevState.posts.length-1].id+1;
         // update id in the 
         const post = {...this.state.post, id:id};
         return { posts: [...prevState.posts, post]}
     })
   }
-
-
-
-
-
   // Render Categories
   rederCategories() {
     return this.state.categories.map((cat) => {
@@ -127,12 +124,7 @@ class Posts extends React.Component {
       <div className="col-sm-8">
         <h3>All about Posts</h3>
         {this.state.fillterPost.map((post) => (
-          <div className="card bg-light mb-3" key={post.id}>
-            <h5 className="card-header text-center">{post.title}</h5>
-            <p className="card-title ml-5">{post.body}</p>
-            <p className="card-text  ml-5">Author - {post.author}</p>
-            <p className="card-text  ml-5">Category - {post.category}</p>
-          </div>
+          <PostDetails key={post.id} post={post} />
         ))}
       </div>
     );
@@ -140,54 +132,15 @@ class Posts extends React.Component {
 
   // render Form
   renderForm() {
-    return (
-      <div className="col-sm-4">
-         <br/>  {this.renderFilter()} <br /><br/>
-         <h3>Post Form</h3>
-         <div className="card bg-light">
-              <div className="card-body">
-                  <form onSubmit={this.handleFormSubmit}> 
-                    <div className="form-group">
-                      <label htmlFor="title">Post Title</label>
-                      <input type="text" className="form-control" id="title" placeholder="Enter a title" 
-                      onChange={this.handleTitleChange} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="body">Body</label>
-                      <input type="text" className="form-control" id="body" placeholder="Enter a body" 
-                      onChange={this.handleBodyChange} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="author">Author</label>
-                      <input type="text" className="form-control" id="author" placeholder="Enter a author" 
-                      onChange={this.handleAuthorChange} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="category">Select Category</label>
-                      <select className="form-control" id="category" name="category"  value={this.state.post.category}
-                       onChange={this.handleCategoryChange}>
-                        <option>...</option>
-                        {this.rederCategories()}
-                      </select>
-                    </div>
-                    <button type='submit' className='btn btn-primary' >Save </button>
-                  </form>
-              </div>
-         </div>
-      </div>
+      return (
+        <PostForm eventObj={this} />
     )
   }
 
   // post filter
   renderFilter() {
     return (
-      <div>
-        <h3> Select posts buy category</h3>
-        <select className="form-control" onChange={this.handleFilterCategoryChange}>
-          <option>...</option>
-          {this.rederCategories()}
-        </select>
-      </div>
+      <PostFilter eventObj={this} />
     );
   }
   // template

@@ -1,14 +1,14 @@
 import './App.css';
 import Header from './components/Header';
-import HelloWorld from './components/HelloWorld';
+import Navbar from './components/Navbar';
 import Posts from './components/Posts';
 
 function App() {
   return (
     <div className='container'>
+      <Navbar />
       <Header  appname="Post Bloggers Webapp !"/>
       <Posts />
-      {/* <HelloWorld  username="Tony Stack"/> */}
     </div>
   );
 }

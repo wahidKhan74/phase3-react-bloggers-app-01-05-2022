@@ -8,6 +8,14 @@ export default function PostDetails(props) {
             <p className="card-title ml-5">{props.post.body}</p>
             <p className="card-text  ml-5">Author - {props.post.author}</p>
             <p className="card-text  ml-5">Category - {props.post.category}</p>
+            <p className="card-footer">
+                <button className="btn btn-sm btn-outline-danger mr-3" onClick={() =>{ props.onDelete(props.post.id);}}>
+                    Delete
+                </button>
+                <button className="btn btn-sm btn-outline-info" onClick={() =>{ props.onUpdate(props.post);}}>
+                    Update
+                </button>
+            </p>
           </div>
     )
 }

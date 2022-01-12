@@ -3,116 +3,112 @@ import PostDetails from "./PostDetails";
 import PostFilter from "./PostFilter";
 import PostForm from "./PostForm";
 
+import {getPosts, addPosts, deletePosts, updatePosts} from '../services/posts-api';
+import {getCategories} from '../services/categories-api';
+
 class Posts extends React.Component {
   // data
   constructor() {
     super();
     this.handleFilterCategoryChange = this.handleFilterCategoryChange.bind(this);
-    this.handleCategoryChange = this.handleCategoryChange.bind(this);
-    this.handleFormSubmit = this.handleFormSubmit.bind(this);
-    this.handleTitleChange = this.handleTitleChange.bind(this);
-    this.handleAuthorChange = this.handleAuthorChange.bind(this);
-    this.handleBodyChange = this.handleBodyChange.bind(this);
-
     this.state = {
-      categories: [
-        { code: "react", name: "React" },
-        { code: "redux", name: "Redux" },
-        { code: "angular", name: "Angular" },
-        { code: "jsx", name: "JSX" },
-      ],
+      categories: [],
       post: { id: 0, title: "", body: "", author: "", category: "" },
-      posts: [
-        {
-          id: 1,
-          title: "Introduction to React js",
-          body: "This post provides an introduction to react",
-          author: "Harry",
-          category: "react",
-        },
-        {
-          id: 2,
-          title: "Advance to React js",
-          body: "This post provides an advance to react features",
-          author: "Marry",
-          category: "react",
-        },
-        {
-          id: 3,
-          title: "Introduction to Redux",
-          body: "This post provides an introduction to react",
-          author: "Jane",
-          category: "redux",
-        },
-        {
-          id: 4,
-          title: "Introduction to JSX",
-          body: "This post provides an introduction to JSX",
-          author: "Jane",
-          category: "jsx",
-        },
-      ],
+      posts: [ ],
       fillterPost: [],
       isFiltered: false,
     };
   }
 
-  // Handle Category Change Event
-  handleCategoryChange = (event) => {
-    const post = this.state.post;
-    this.setState({post :{...post, category: event.target.value}})
-  };
+   //component lifecycle methods
+   componentDidMount() { 
 
-  // Handle Title Change Event
-  handleTitleChange = (event) => {
-    const post = this.state.post;
-    this.setState({post :{...post, title: event.target.value}})
-  };
+    // load all post data
+    getPosts().then((posts)=>{
+      // console.log(posts);
+      this.setState({ posts : posts});
+    }).catch(error=>{
+      console.log("Failed to load posts data.");
+    });
 
-  // Handle Body Change Event
-  handleBodyChange = (event) => {
-    const post = this.state.post;
-    this.setState({post :{...post, body: event.target.value}})
-  };
+    // load all categories data
+    getCategories().then(categories=>{
+      this.setState({ categories : categories});
+    }).catch(error=>{
+      console.log("Failed to load categories data.");
+    });
+   }
 
-  // Handle Author Change Event
-  handleAuthorChange = (event) => {
-    const post = this.state.post;
-    this.setState({post :{...post, author: event.target.value}})
-  };
-
+  
   // handle filters
   handleFilterCategoryChange = (event) => {
     this.setState((preState) => {
       let fillterPost = preState.posts.filter((post) => {
-        return post.category == event.target.value;
+        return post.category === event.target.value;
       });
       this.state.isFiltered = true;
       return { fillterPost: fillterPost };
     });
   };
 
-  // Event Handler
-  handleFormSubmit(event) {
-    // prevent default event submit
-    event.preventDefault();
-    // console.log("post", this.state.post);
-    this.setState((prevState)=>{
-        const id = (prevState.posts.length ===0) ? 1 : prevState.posts[prevState.posts.length-1].id+1;
-        // update id in the 
-        const post = {...this.state.post, id:id};
-        return { posts: [...prevState.posts, post]}
-    })
-  }
-  // Render Categories
-  rederCategories() {
-    return this.state.categories.map((cat) => {
-      return (
-        <option key={cat.code} value={cat.code}>
-          {cat.name}
-        </option>
-      );
+  // create post
+  hadleNewPost = (post) => {
+    delete post.id;
+    addPosts(post).then(newPost=> {
+     // console.log(newPost);
+      this.setState((prevState)=>{
+        return { posts: [...prevState.posts, newPost]}
+      });
+    }).catch(error=>{
+      console.log("Failed to create post data.");
     });
+  }
+
+  // update post
+  handleUpdatePost = (post) => {
+    updatePosts(post).then(updatePost=> {
+      // console.log(updatePost);
+      this.setState((prevState)=>{
+        let updatedList = prevState.posts.map(pt=>{
+          if(pt.id===updatePost.id) {
+            return updatePost;
+          }else{
+            return pt;
+          }
+        })
+        return { posts: [...updatedList]}
+      });
+    }).catch(error=>{
+      console.log("Failed to create post data.");
+    });
+  }
+
+  handlePost = (post) =>{
+    // console.log(post.id);
+    if(post.id !== undefined && post.id !=="" && post.id !== null)
+      this.handleUpdatePost(post);
+    else 
+      this.hadleNewPost(post);
+  }
+
+  //delete post
+  handleDelete = (id) =>{
+    deletePosts(id).then(respose=>{
+      this.setState((preState)=>{
+        const filterPost = preState.posts.filter(post=>{
+          return post.id != id;
+        });
+        return { posts : filterPost};
+      })
+    }).catch(error=>{
+      console.log("Failed to delete a post data.");
+    });;
+  }
+
+  // update post
+  handleUpdate =(post) =>{
+    // console.log(post);
+    this.setState({ post : post});
   }
 
   // posts rendering logic
@@ -124,17 +120,10 @@ class Posts extends React.Component {
       <div className="col-sm-8">
         <h3>All about Posts</h3>
         {this.state.fillterPost.map((post) => (
-          <PostDetails key={post.id} post={post} />
+          <PostDetails key={post.id} post={post}  onDelete={this.handleDelete} onUpdate={this.handleUpdate} />
         ))}
       </div>
     );
-  }
-
-  // render Form
-  renderForm() {
-      return (
-        <PostForm eventObj={this} />
-    )
   }
 
   // post filter
@@ -146,7 +135,8 @@ class Posts extends React.Component {
   // template
   render() {
     return ( <div className="row">
-      {this.renderForm()}
+      { <PostForm categories={this.state.categories} post={this.state.post} onNewPost={this.handlePost} />
+    }
       {this.renderPosts()}
     </div>);
   }

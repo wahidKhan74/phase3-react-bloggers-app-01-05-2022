@@ -35,27 +35,37 @@ export default function Navbar() {
               Users
             </NavLink>
           </li>
+          <li className="nav-item">
+            <NavLink className="nav-link" exact to="/login" >
+              Login
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink className="nav-link" exact to="/register" >
+              Register
+            </NavLink>
+          </li>
           <li className="nav-item dropdown">
-            <a
+            <NavLink
               className="nav-link dropdown-toggle"
-              href="#"
+              to="/features"
               id="navbarDropdown"
               role="button"
               data-toggle="dropdown"
               aria-expanded="false"
             >
               Features
-            </a>
+            </NavLink>
             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a className="dropdown-item" href="#">
+              <NavLink className="dropdown-item" to="/products">
                 Products
-              </a>
-              <a className="dropdown-item" href="#">
+              </NavLink>
+              <NavLink className="dropdown-item" to="/courses">
                 Cources
-              </a>
-              <a className="dropdown-item" href="#">
+              </NavLink>
+              <NavLink className="dropdown-item" to="/blogs">
                 Blogs
-              </a>
+              </NavLink>
             </div>
           </li>
         </ul>
